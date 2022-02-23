@@ -10,9 +10,19 @@ public class TestSL3PExample : MonoBehaviour
 {
     public Text networkIDTextUI;
     public Text accountTextUI;
+
+    [Header("Balance")]
     public Text balanceTextUI;
+
+    [Header("Function - Approve")]
+    public InputField approveToInput;
+    public InputField approveAmountInput;
+
+    [Header("Function - Transfer")]
     public InputField transferToInput;
     public InputField transferAmountInput;
+
+
 
     private string account = "";
     private int chainId = 0;
@@ -55,7 +65,7 @@ public class TestSL3PExample : MonoBehaviour
                     else
                     {
                         print("connected to leprichain network");
-                        await GetAllBalance();
+                        await Balance();
                     }
                 }
             }
@@ -69,73 +79,113 @@ public class TestSL3PExample : MonoBehaviour
        
     }
 
-    public void GetBalance()
+    public async void ExecuteBalance()
     {
-        GetAllBalance();
+        await Balance();
     }
 
-    public async Task GetAllBalance()
+    public async Task Balance()
     {
-        print("I'm getting balance");
+        print("Getting Balance");
         BigInteger balanceOfFromWei = await testSL3PContract.BalanceOf(LeprichainMainnet.name, LeprichainMainnet.network, account, LeprichainMainnet.rpc, true);
-        print(balanceOfFromWei);
         balanceTextUI.text = (balanceOfFromWei).ToString();
-        print("I'm getting balance x1");
+        print("Received Balance Number " + balanceOfFromWei);
     }
 
-    public async void Approve()
-    {  
-        print("approve");
-        string transaction = await testSL3PContract.Approve(
-            testSL3PContract.Address,
-            new BigInteger(1 * Math.Pow(10, testSL3PContract.Decimals)).ToString()
-        );
-        
-        print("result: " + transaction);
-        await GetAllBalance();
-        if (transaction == "")
-        {
-            return;
-        }
-        print("Getting tx");
-        bool txConfirmed = await EVMExtensions.WaitForTxFinished(LeprichainMainnet.name, LeprichainMainnet.network, transaction, LeprichainMainnet.rpc);
-        print(txConfirmed);
-        //print(balanceOf / TestSL3P.decimals * 10);
-        //balanceTextUI.text = (balanceOf / TestSL3P.decimals * 10).ToString();
-    }
-
-    public async void Transfer()
+    public async void ExecuteApprove()
     {
-        int tokenAmount = 0;
+        await Approve();
+    }
+
+    public async Task Approve()
+    {
+        float tokenAmount = 0;
 
         // Send back to contract address for testing
         string toAddress = testSL3PContract.Address;
 
         // Manual input
-        if(transferAmountInput.text != "")
+        if (approveToInput.text != "" && !approveToInput.text.Contains("0x"))
+        {
+            toAddress = approveAmountInput.text;
+        }
+        else
+        {
+            Debug.LogWarning("to address not found, you must input a valid erc20 address.");
+            return;
+        }
+
+        if (!float.TryParse(approveToInput.text, out tokenAmount))
+        {
+            Debug.LogWarning("token amount format error.");
+            return;
+        }
+
+        print("start approve");
+        string transaction = await testSL3PContract.Approve(
+            toAddress,
+            new BigInteger(tokenAmount * Math.Pow(10, testSL3PContract.Decimals)).ToString()
+        );
+        
+        print("result: " + transaction);
+        if (transaction == "")
+        {
+            Debug.LogWarning("approve canceled");
+            return;
+        }
+
+        print("Getting approve tx");
+        bool txConfirmed = await EVMExtensions.WaitForTxFinished(LeprichainMainnet.name, LeprichainMainnet.network, transaction, LeprichainMainnet.rpc);
+        print(txConfirmed);
+    }
+
+    public async void ExecuteTransfer()
+    {
+        await Transfer();
+        // Renew balance
+        await Balance();
+    }
+
+    public async Task Transfer()
+    {
+        float tokenAmount = 0;
+
+        // Send back to contract address for testing
+        string toAddress = testSL3PContract.Address;
+
+        // Manual input
+        if(transferToInput.text != "" && !transferToInput.text.Contains("0x"))
         {
             toAddress = transferAmountInput.text;
-        }
-
-        if (int.TryParse(transferToInput.text, out tokenAmount))
+        } 
+        else
         {
-            print("transfer");
-            string transaction = await testSL3PContract.Transfer(
-                testSL3PContract.Address,
-                new BigInteger(1 * Math.Pow(10, testSL3PContract.Decimals)).ToString()
-            );
-
-            print("result: " + transaction);
-            await GetAllBalance();
-            if (transaction == "")
-            {
-                return;
-            }
-            print("Getting tx");
-            bool txConfirmed = await EVMExtensions.WaitForTxFinished(LeprichainMainnet.name, LeprichainMainnet.network, transaction, LeprichainMainnet.rpc);
-            print(txConfirmed);
+            Debug.LogWarning("to address not found, you must input a valid erc20 address.");
+            return;
         }
 
+        if (!float.TryParse(transferToInput.text, out tokenAmount))
+        {
+            Debug.LogWarning("token amount format error.");
+            return;
+        }
+
+        print("start transfer");
+        string transaction = await testSL3PContract.Transfer(
+            testSL3PContract.Address,
+            new BigInteger(1 * Math.Pow(10, testSL3PContract.Decimals)).ToString()
+        );
+
+        print("result: " + transaction);
+        if (transaction == "")
+        {
+            Debug.LogWarning("transfer canceled");
+            return;
+        }
+
+        print("Getting transfer tx");
+        bool txConfirmed = await EVMExtensions.WaitForTxFinished(LeprichainMainnet.name, LeprichainMainnet.network, transaction, LeprichainMainnet.rpc);
+        print(txConfirmed);
 
     }
 
