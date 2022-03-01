@@ -11,6 +11,12 @@ public class TestSL3PExample : MonoBehaviour
     public Text networkIDTextUI;
     public Text accountTextUI;
 
+    [Header("Name")]
+    public Text nameTextUI;
+
+    [Header("TotalSupply")]
+    public Text totalSupplyTextUI;
+
     [Header("Balance")]
     public Text balanceTextUI;
 
@@ -58,7 +64,8 @@ public class TestSL3PExample : MonoBehaviour
                 {
                     chainId = Web3GL.Network();
                     networkIDTextUI.text = chainId.ToString();
-                    if (networkIDTextUI.text != "49777")
+                    //if (networkIDTextUI.text != "49777")
+                    if(networkIDTextUI.text != "49778")
                     {
                         print("wrong network");
                     }
@@ -81,25 +88,19 @@ public class TestSL3PExample : MonoBehaviour
 
     public async void ExecuteBalance()
     {
-        await Balance();
+        balanceTextUI.text = (await Balance()).ToString();  
     }
 
-    public async Task Balance()
+    public async Task<BigInteger> Balance()
     {
         print("Getting Balance");
         BigInteger balanceOfFromWei = await testSL3PContract.BalanceOf(LeprichainMainnet.name, LeprichainMainnet.network, account, LeprichainMainnet.rpc, true);
-        balanceTextUI.text = (balanceOfFromWei).ToString();
         print("Received Balance Number " + balanceOfFromWei);
+        return balanceOfFromWei;
     }
 
     public async void ExecuteApprove()
     {
-        await Approve();
-    }
-
-    public async Task Approve()
-    {
-        float tokenAmount = 0;
 
         // Send back to contract address for testing
         string toAddress = testSL3PContract.Address;
@@ -115,11 +116,19 @@ public class TestSL3PExample : MonoBehaviour
             return;
         }
 
+        float tokenAmount = 0;
+
         if (!float.TryParse(approveToInput.text, out tokenAmount))
         {
             Debug.LogWarning("token amount format error.");
             return;
         }
+
+        await Approve(toAddress, tokenAmount);
+    }
+
+    public async Task<bool> Approve(string toAddress, float tokenAmount)
+    {
 
         print("start approve");
         string transaction = await testSL3PContract.Approve(
@@ -131,44 +140,48 @@ public class TestSL3PExample : MonoBehaviour
         if (transaction == "")
         {
             Debug.LogWarning("approve canceled");
-            return;
+            return false;
         }
 
         print("Getting approve tx");
         bool txConfirmed = await EVMExtensions.WaitForTxFinished(LeprichainMainnet.name, LeprichainMainnet.network, transaction, LeprichainMainnet.rpc);
         print(txConfirmed);
+        return txConfirmed;
+
     }
 
     public async void ExecuteTransfer()
     {
-        await Transfer();
-        // Renew balance
-        await Balance();
-    }
-
-    public async Task Transfer()
-    {
-        float tokenAmount = 0;
 
         // Send back to contract address for testing
         string toAddress = testSL3PContract.Address;
 
         // Manual input
-        if(transferToInput.text != "" && !transferToInput.text.Contains("0x"))
+        if (transferToInput.text != "" && !transferToInput.text.Contains("0x"))
         {
             toAddress = transferAmountInput.text;
-        } 
+        }
         else
         {
             Debug.LogWarning("to address not found, you must input a valid erc20 address.");
             return;
         }
 
+        float tokenAmount = 0;
+
         if (!float.TryParse(transferToInput.text, out tokenAmount))
         {
             Debug.LogWarning("token amount format error.");
             return;
         }
+
+        await Transfer(toAddress, tokenAmount);
+        // Renew balance
+        ExecuteBalance();
+    }
+
+    public async Task<bool> Transfer(string toAddress, float tokenAmount)
+    {
 
         print("start transfer");
         string transaction = await testSL3PContract.Transfer(
@@ -180,13 +193,39 @@ public class TestSL3PExample : MonoBehaviour
         if (transaction == "")
         {
             Debug.LogWarning("transfer canceled");
-            return;
+            return false;
         }
 
         print("Getting transfer tx");
         bool txConfirmed = await EVMExtensions.WaitForTxFinished(LeprichainMainnet.name, LeprichainMainnet.network, transaction, LeprichainMainnet.rpc);
         print(txConfirmed);
+        return txConfirmed;
+    }
+
+
+    public async void ExecuteGetName()
+    {
+        nameTextUI.text = (await GetName());
+    }
+
+    public async Task<string> GetName()
+    {
+        string name = await ERC20.Name(LeprichainMainnet.name, LeprichainMainnet.network, testSL3PContract.Address, LeprichainMainnet.rpc);
+        print(name);
+        return name;
+    }
+
+    public async void ExecuteGetTotalSupply()
+    {
+
+        totalSupplyTextUI.text = (await GetTotalSupply()).ToString();
 
     }
 
+    public async Task<BigInteger> GetTotalSupply()
+    {
+        BigInteger totalSupply = await ERC20.TotalSupply(LeprichainMainnet.name, LeprichainMainnet.network, testSL3PContract.Address, LeprichainMainnet.rpc);
+        print(totalSupply);
+        return (totalSupply);
+    }
 }
