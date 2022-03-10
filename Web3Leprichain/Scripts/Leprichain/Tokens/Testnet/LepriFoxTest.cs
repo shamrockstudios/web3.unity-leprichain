@@ -10,7 +10,7 @@ public class LepriFoxTest : Ethereum.ERC721
 
     public LepriFoxTest() : base(
         "LFT",
-        "0x548533601451F53ce7fffACE7993E18CF70b54B2",
+        "0xF1d1B8AFCC7Eb8bbCFbE1aC54728f9969d32cF2b",
         abi)
     { }
 }

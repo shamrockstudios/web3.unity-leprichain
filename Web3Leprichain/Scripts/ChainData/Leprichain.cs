@@ -13,5 +13,5 @@ public class LeprichainTestnet
 {
     public static string name = "Leprichain";
     public static string network = "testnet";
-    public static string rpc = "https://node.leprichain.blockwell.ai";
+    public static string rpc = "https://node.lepritest.blockwell.ai";
 }

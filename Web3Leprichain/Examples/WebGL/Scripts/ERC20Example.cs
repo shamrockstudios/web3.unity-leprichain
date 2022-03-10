@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TestSL3PExample : MonoBehaviour
+public class ERC20Example : MonoBehaviour
 {
     public Text networkIDTextUI;
     public Text accountTextUI;
@@ -29,12 +29,10 @@ public class TestSL3PExample : MonoBehaviour
     public InputField transferAmountInput;
 
 
-
     private string account = "";
     private int chainId = 0;
 
-    private TestSL3P testSL3PContract;
-
+    private readonly TestGameToken testGameTokenContract = new TestGameToken();
 
     // Start is called before the first frame update
     void Start()
@@ -72,7 +70,7 @@ public class TestSL3PExample : MonoBehaviour
                     else
                     {
                         print("connected to leprichain network");
-                        await Balance();
+                        ExecuteBalance();
                     }
                 }
             }
@@ -94,7 +92,8 @@ public class TestSL3PExample : MonoBehaviour
     public async Task<BigInteger> Balance()
     {
         print("Getting Balance");
-        BigInteger balanceOfFromWei = await testSL3PContract.BalanceOf(LeprichainMainnet.name, LeprichainMainnet.network, account, LeprichainMainnet.rpc, true);
+        print(account);
+        BigInteger balanceOfFromWei = await testGameTokenContract.BalanceOf(LeprichainTestnet.name, LeprichainTestnet.network, account, LeprichainTestnet.rpc, true);
         print("Received Balance Number " + balanceOfFromWei);
         return balanceOfFromWei;
     }
@@ -103,10 +102,10 @@ public class TestSL3PExample : MonoBehaviour
     {
 
         // Send back to contract address for testing
-        string toAddress = testSL3PContract.Address;
+        string toAddress = testGameTokenContract.Address;
 
         // Manual input
-        if (approveToInput.text != "" && !approveToInput.text.Contains("0x"))
+        if (approveToInput.text != "" && approveToInput.text.Contains("0x"))
         {
             toAddress = approveAmountInput.text;
         }
@@ -131,9 +130,9 @@ public class TestSL3PExample : MonoBehaviour
     {
 
         print("start approve");
-        string transaction = await testSL3PContract.Approve(
+        string transaction = await testGameTokenContract.Approve(
             toAddress,
-            new BigInteger(tokenAmount * Math.Pow(10, testSL3PContract.Decimals)).ToString()
+            new BigInteger(tokenAmount * Math.Pow(10, testGameTokenContract.Decimals)).ToString()
         );
         
         print("result: " + transaction);
@@ -144,7 +143,7 @@ public class TestSL3PExample : MonoBehaviour
         }
 
         print("Getting approve tx");
-        bool txConfirmed = await EVMExtensions.WaitForTxFinished(LeprichainMainnet.name, LeprichainMainnet.network, transaction, LeprichainMainnet.rpc);
+        bool txConfirmed = await EVMExtensions.WaitForTxFinished(LeprichainTestnet.name, LeprichainTestnet.network, transaction, LeprichainTestnet.rpc);
         print(txConfirmed);
         return txConfirmed;
 
@@ -154,10 +153,10 @@ public class TestSL3PExample : MonoBehaviour
     {
 
         // Send back to contract address for testing
-        string toAddress = testSL3PContract.Address;
+        string toAddress = testGameTokenContract.Address;
 
         // Manual input
-        if (transferToInput.text != "" && !transferToInput.text.Contains("0x"))
+        if (transferToInput.text != "" && transferToInput.text.Contains("0x"))
         {
             toAddress = transferAmountInput.text;
         }
@@ -184,9 +183,9 @@ public class TestSL3PExample : MonoBehaviour
     {
 
         print("start transfer");
-        string transaction = await testSL3PContract.Transfer(
-            testSL3PContract.Address,
-            new BigInteger(1 * Math.Pow(10, testSL3PContract.Decimals)).ToString()
+        string transaction = await testGameTokenContract.Transfer(
+            testGameTokenContract.Address,
+            new BigInteger(1 * Math.Pow(10, testGameTokenContract.Decimals)).ToString()
         );
 
         print("result: " + transaction);
@@ -197,7 +196,7 @@ public class TestSL3PExample : MonoBehaviour
         }
 
         print("Getting transfer tx");
-        bool txConfirmed = await EVMExtensions.WaitForTxFinished(LeprichainMainnet.name, LeprichainMainnet.network, transaction, LeprichainMainnet.rpc);
+        bool txConfirmed = await EVMExtensions.WaitForTxFinished(LeprichainTestnet.name, LeprichainTestnet.network, transaction, LeprichainTestnet.rpc);
         print(txConfirmed);
         return txConfirmed;
     }
@@ -210,7 +209,7 @@ public class TestSL3PExample : MonoBehaviour
 
     public async Task<string> GetName()
     {
-        string name = await ERC20.Name(LeprichainMainnet.name, LeprichainMainnet.network, testSL3PContract.Address, LeprichainMainnet.rpc);
+        string name = await ERC20.Name(LeprichainTestnet.name, LeprichainTestnet.network, testGameTokenContract.Address, LeprichainTestnet.rpc);
         print(name);
         return name;
     }
@@ -224,7 +223,7 @@ public class TestSL3PExample : MonoBehaviour
 
     public async Task<BigInteger> GetTotalSupply()
     {
-        BigInteger totalSupply = await ERC20.TotalSupply(LeprichainMainnet.name, LeprichainMainnet.network, testSL3PContract.Address, LeprichainMainnet.rpc);
+        BigInteger totalSupply = await ERC20.TotalSupply(LeprichainTestnet.name, LeprichainTestnet.network, testGameTokenContract.Address, LeprichainTestnet.rpc);
         print(totalSupply);
         return (totalSupply);
     }

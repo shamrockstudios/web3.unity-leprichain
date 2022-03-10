@@ -43,21 +43,13 @@ namespace Ethereum
             }
         }
 
-        public virtual async Task<int> BalanceOf(string _chain, string _network, string _account, string _rpc = "")
+        public virtual async Task<string> BalanceOf(string _chain, string _network, string _account, string _rpc = "")
         {
             string method = "balanceOf";
             string[] obj = { _account };
             string args = JsonConvert.SerializeObject(obj);
             string response = await EVM.Call(_chain, _network, _contract, _abi, method, args, _rpc);
-            try
-            {
-                return int.Parse(response);
-            }
-            catch
-            {
-                Debug.LogError(response);
-                throw;
-            }
+            return response;
         }
 
         public virtual async Task<string> OwnerOf(string _chain, string _network, string _tokenId, string _rpc = "")

@@ -26,7 +26,9 @@ namespace Ethereum
             string[] obj = { _account };
             string args = JsonConvert.SerializeObject(obj);
             string response = await EVM.Call(_chain, _network, _contract, _abi, method, args, _rpc);
-            Debug.Log(response);
+            Debug.Log("Balance: ");
+            Debug.Log("123: ");
+            Debug.Log("Balance: " + response);
             try
             {
                 if (_removeDecimals)
@@ -37,6 +39,7 @@ namespace Ethereum
             }
             catch (Exception e)
             {
+                Debug.LogError(e);
                 Debug.LogError(response);
                 throw e;
             }

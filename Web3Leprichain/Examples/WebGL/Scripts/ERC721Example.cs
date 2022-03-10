@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class ERC721Example : MonoBehaviour
@@ -28,6 +29,7 @@ public class ERC721Example : MonoBehaviour
     [Header("TokenURI")]
     public InputField tokenURIIdInput;
     public Text tokenURITextUI;
+    public RawImage tokenImage;
 
     [Header("Function - Approve")]
     public InputField approveToInput;
@@ -42,7 +44,7 @@ public class ERC721Example : MonoBehaviour
     private string account = "";
     private int chainId = 0;
 
-    private LepriFoxTest lepriFoxTextContract;
+    private LepriFoxTest lepriFoxTextContract = new LepriFoxTest();
 
 
     // Start is called before the first frame update
@@ -101,7 +103,18 @@ public class ERC721Example : MonoBehaviour
             return;
         }
 
-        tokenURITextUI.text = (await TokenURI(ownerOfTokenIdInput.text));
+        tokenURITextUI.text = (await TokenURI(tokenURIIdInput.text));
+
+        // Metadata
+        UnityWebRequest metadataRequest = UnityWebRequest.Get(tokenURITextUI.text);
+        await metadataRequest.SendWebRequest();
+        ERC721Metadata metadata = JsonUtility.FromJson<ERC721Metadata>(metadataRequest.downloadHandler.text);
+
+        // Image
+        UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(metadata.image);
+        await imageRequest.SendWebRequest();
+        tokenImage.texture = DownloadHandlerTexture.GetContent(imageRequest);
+
     }
 
     public async Task<string> TokenURI(string tokenId)
@@ -142,12 +155,10 @@ public class ERC721Example : MonoBehaviour
         balanceTextUI.text = (await BalanceOf(balanceOfAddressInput.text)).ToString();
     }
 
-    public async Task<BigInteger> BalanceOf(string address)
+    public async Task<string> BalanceOf(string address)
     {
         print("Getting Balance");
-        BigInteger balanceOfFromWei = await lepriFoxTextContract.BalanceOf(LeprichainTestnet.name, LeprichainTestnet.network, address, LeprichainTestnet.rpc);
-        print("Received Balance Number " + balanceOfFromWei);
-        return balanceOfFromWei;
+        return await lepriFoxTextContract.BalanceOf(LeprichainTestnet.name, LeprichainTestnet.network, address, LeprichainTestnet.rpc);
     }
 
 

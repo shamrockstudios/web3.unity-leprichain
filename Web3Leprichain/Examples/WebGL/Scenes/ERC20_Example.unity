@@ -153,6 +153,7 @@ RectTransform:
   m_Children:
   - {fileID: 56772003}
   - {fileID: 57770779}
+  - {fileID: 628977199}
   m_Father: {fileID: 1039437579}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -334,7 +335,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Test sL3P
+  m_Text: TokenName
 --- !u!222 &56772005
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -355,7 +356,7 @@ GameObject:
   - component: {fileID: 57770781}
   - component: {fileID: 57770780}
   m_Layer: 5
-  m_Name: Text_PlayerBalance
+  m_Name: Text_Supply
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -413,7 +414,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Balance
+  m_Text: Supply
 --- !u!222 &57770781
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -665,7 +666,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1884451458}
         m_TargetAssemblyTypeName: TestSL3PExample, Assembly-CSharp
-        m_MethodName: ExecuteBalance
+        m_MethodName: ExecuteGetTotalSupply
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1162,6 +1163,85 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 447708954}
   m_CullTransparentMesh: 1
+--- !u!1 &628977198
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 628977199}
+  - component: {fileID: 628977200}
+  - component: {fileID: 628977201}
+  m_Layer: 5
+  m_Name: Text_PlayerBalance
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &628977199
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628977198}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 28763457}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &628977200
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628977198}
+  m_CullTransparentMesh: 1
+--- !u!114 &628977201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628977198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 25
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 2
+    m_MaxSize: 40
+    m_Alignment: 3
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Balance
 --- !u!1 &732674713
 GameObject:
   m_ObjectHideFlags: 0
@@ -2126,7 +2206,7 @@ GameObject:
   - component: {fileID: 1280164150}
   - component: {fileID: 1280164149}
   m_Layer: 5
-  m_Name: Btn_GetBalance (1)
+  m_Name: Btn_GetBalance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3134,7 +3214,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1884451458}
         m_TargetAssemblyTypeName: TestSL3PExample, Assembly-CSharp
-        m_MethodName: ExecuteBalance
+        m_MethodName: ExecuteGetName
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3349,9 +3429,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   networkIDTextUI: {fileID: 1468218305}
   accountTextUI: {fileID: 1997310636}
-  nameTextUI: {fileID: 1997310636}
-  totalSupplyTextUI: {fileID: 56772004}
-  balanceTextUI: {fileID: 57770780}
+  nameTextUI: {fileID: 56772004}
+  totalSupplyTextUI: {fileID: 57770780}
+  balanceTextUI: {fileID: 628977201}
   approveToInput: {fileID: 1341653720}
   approveAmountInput: {fileID: 1082262449}
   transferToInput: {fileID: 732674715}
